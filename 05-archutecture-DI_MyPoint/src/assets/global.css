@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+::-webkit-scrollbar {
+  @apply w-[8px] h-[8px];
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+
+body {
+  @apply flex flex-col min-h-screen p-4 bg-neutral-200;
+
+  header,
+  main {
+    @apply max-w-5xl mx-auto;
+  }
+
+  header {
+    @apply flex items-center justify-between mb-4 min-h-20;
+    @apply p-4 bg-neutral-50 rounded;
+    @apply shadow-lg shadow-gray-300;
+
+    h1 {
+      @apply text-lg lg:text-2xl font-bold text-neutral-800;
+    }
+  }
+
+  main {
+    @apply flex flex-col sm:flex-row gap-2 items-start;
+  }
+}
+
+.app-card {
+  @apply p-2 bg-neutral-50 rounded;
+  @apply border-[1px] border-neutral-300;
+  @apply shadow-md shadow-gray-300;
+}
+
+.app-card-title {
+  @apply text-lg font-semibold mb-2 leading-12;
+}
+
+.app-card-title__border {
+  @apply border-b-2 border-neutral-300;
+}
+
+.table-container {
+  @apply w-full overflow-x-auto;
+}
+
+table {
+  @apply w-full text-left;
+  @apply border-collapse border-spacing-0;
+
+  thead th {
+    @apply p-2 font-semibold text-neutral-600 bg-gray-200;
+  }
+
+  tbody tr {
+    @apply font-normal text-neutral-800;
+  }
+
+  tbody tr span,
+  tbody tr input {
+    @apply text-sm p-2 block h-[36px] w-full min-w-10 max-w-48 bg-blue-400;
+  }
+
+  tbody tr:nth-child(odd) {
+    @apply bg-gray-100;
+  }
+
+  th,
+  td {
+    @apply border-[1px] border-neutral-300 text-xs text-center text-nowrap;
+  }
+}
