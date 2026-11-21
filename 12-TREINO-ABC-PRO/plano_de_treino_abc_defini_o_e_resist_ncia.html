@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Treino ABC Pro • Definição & Resistência</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            slate: {
+              950: '#070b14',
+              900: '#0d1322',
+              850: '#131c31',
+              800: '#1a253f',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #070b14;
+      color: #f1f5f9;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .svg-stage {
+      background: radial-gradient(circle at 50% 45%, rgba(16, 185, 129, 0.08) 0%, rgba(13, 19, 34, 0.95) 75%);
+    }
+    .card-completed {
+      border-color: rgba(16, 185, 129, 0.45) !important;
+      background-color: rgba(13, 25, 34, 0.85) !important;
+    }
+    .card-completed .exercise-title {
+      text-decoration: line-through;
+      color: #94a3b8;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0d1322;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-slate-950">
+
+  <!-- Header Sticky -->
+  <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80">
+    <div class="max-w-6xl mx-auto px-4 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-slate-950 font-extrabold shadow-lg shadow-emerald-500/20">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white leading-none">TREINO ABC PRO</h1>
+            <p class="text-[11px] font-medium text-emerald-400 mt-1">Recomposição • Definição & Resistência</p>
+          </div>
+        </div>
+        <button onclick="resetProgress()" title="Reiniciar marcações" class="sm:hidden text-xs px-2.5 py-1.5 rounded-lg bg-slate-800/80 text-slate-300 hover:text-white border border-slate-700/60">
+          Zerar Check
+        </button>
+      </div>
+
+      <!-- Barra de Progresso do Treino Ativo -->
+      <div class="flex items-center gap-3">
+        <div class="flex-1 sm:w-48">
+          <div class="flex justify-between text-[11px] font-semibold mb-1">
+            <span class="text-slate-400" id="progressLabel">Progresso Treino A</span>
+            <span class="text-emerald-400" id="progressPercent">0%</span>
+          </div>
+          <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+            <div id="progressBar" class="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+        <button onclick="resetProgress()" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/70 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Resetar
+        </button>
+      </div>
+    </div>
+
+    <!-- Navegação por Abas -->
+    <div class="max-w-6xl mx-auto px-4 pb-3">
+      <div class="grid grid-cols-4 gap-1.5 sm:gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800/80">
+        <button onclick="switchTab('A')" id="tab-A" class="tab-btn py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1">
+          <span>Treino A</span>
+          <span class="text-[10px] sm:text-xs font-medium opacity-80">Empurrar</span>
+        </button>
+        <button onclick="switchTab('B')" id="tab-B" class="tab-btn py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1">
+          <span>Treino B</span>
+          <span class="text-[10px] sm:text-xs font-medium opacity-80">Puxar</span>
+        </button>
+        <button onclick="switchTab('C')" id="tab-C" class="tab-btn py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1">
+          <span>Treino C</span>
+          <span class="text-[10px] sm:text-xs font-medium opacity-80">Pernas & Core</span>
+        </button>
+        <button onclick="switchTab('ALL')" id="tab-ALL" class="tab-btn py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1">
+          <span>Todos</span>
+          <span class="text-[10px] sm:text-xs font-medium opacity-80">Visão Geral</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner de Estratégia e Filtro Rápido -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 pt-5 pb-28">
+    <div id="workoutHeader" class="mb-6 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-850 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold mb-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="headerBadge">Foco: Peito Completo, Ombros e Tríceps</span>
+        </div>
+        <h2 id="headerTitle" class="text-xl sm:text-2xl font-extrabold text-white">Treino A — Empurrar & Core Anterior</h2>
+        <p id="headerDesc" class="text-xs sm:text-sm text-slate-400 mt-1">Cadência controlada (2s descida / 1s subida). Mantenha o descanso cronometrado para acelerar a queima calórica.</p>
+      </div>
+      
+      <!-- Busca / Filtro -->
+      <div class="relative w-full md:w-64 shrink-0">
+        <input type="text" id="searchInput" oninput="renderExercises()" placeholder="Buscar exercício ou músculo..." class="w-full bg-slate-950/80 border border-slate-700/80 focus:border-emerald-500 focus:outline-none rounded-xl pl-9 pr-3 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 transition" />
+        <svg class="w-4 h-4 text-slate-500 absolute left-3 top-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Grid de Cards de Exercícios -->
+    <div id="exercisesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- Renderizado via JS -->
+    </div>
+  </main>
+
+  <!-- Cronômetro Flutuante de Descanso -->
+  <div id="timerDock" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-md bg-slate-900/95 backdrop-blur-xl border border-slate-700/90 shadow-2xl shadow-black/70 rounded-2xl px-4 py-3 transition-all duration-300">
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div id="timerRing" class="w-11 h-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-mono text-base font-extrabold text-emerald-400">
+          00:00
+        </div>
+        <div>
+          <p id="timerTitle" class="text-xs font-bold text-white leading-tight">Cronômetro de Descanso</p>
+          <p id="timerSubtitle" class="text-[11px] text-slate-400">Selecione um tempo ou clique no card</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button onclick="startTimer(45, 'Descanso Curto (45s)')" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-xs font-bold text-slate-200 transition">45s</button>
+        <button onclick="startTimer(60, 'Descanso Moderado (60s)')" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-xs font-bold text-slate-200 transition">60s</button>
+        <button onclick="startTimer(75, 'Descanso Base (75s)')" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-xs font-bold text-slate-200 transition">75s</button>
+        <button onclick="stopTimer()" id="stopTimerBtn" class="hidden p-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 transition" title="Parar">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast de Notificação (Substitui alert) -->
+  <div id="toastBox" class="fixed top-20 right-4 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 bg-emerald-500 text-slate-950 font-bold text-xs px-4 py-3 rounded-xl shadow-xl flex items-center gap-2">
+    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+    <span id="toastMessage">Descanso concluído! Próxima série.</span>
+  </div>
+
+  <script>
+    // =========================================================================
+    // DADOS COMPLETOS DOS TREINOS A, B E C + ILUSTRAÇÕES SVG BIOMECÂNICAS ÚNICAS
+    // =========================================================================
+    const WORKOUT_META = {
+      A: {
+        badge: "Peito Completo • Ombros 3D • Tríceps • Core",
+        title: "Treino A — Empurrar & Core Anterior",
+        desc: "Cobertura completa das 3 porções do peitoral (superior, médio e inferior), deltóides e tríceps, finalizando com prancha e esteira inclinada."
+      },
+      B: {
+        badge: "Costas em Largura & Espessura • Posterior • Bíceps",
+        title: "Treino B — Puxar & Oblíquos",
+        desc: "Foco em expansão dorsal, postura escapular, bíceps/braquial e rotação de tronco, fechando com cardio para queima calórica."
+      },
+      C: {
+        badge: "Quadríceps • Posterior • Glúteos • Panturrilha • Abdômen",
+        title: "Treino C — Pernas Completas & Core",
+        desc: "O maior acelerador metabólico da semana: multiarticulares pesados seguidos de isolamento, panturrilha e abdômen supra/infra."
+      },
+      ALL: {
+        badge: "Visão Geral • 30 Exercícios Mapeados",
+        title: "Plano Completo ABC — Todos os Movimentos",
+        desc: "Visualize todos os exercícios dos treinos A, B e C com seus respectivos diagramas biomecânicos e tempos de descanso."
+      }
+    };
+
+    /**
+     * Gera o SVG vetorial específico para cada exercício com:
+     * - Equipamento esquemático (banco, polia, barra, halteres, máquina)
+     * - Silhueta articulada executando a postura real do movimento
+     * - Destaque anatômico em verde/ciano (#10b981 / #38bdf8) no grupo muscular alvo
+     * - Setas vetoriais (#f59e0b / #10b981) mostrando o vetor de força/direção
+     */
+    function getExerciseSVG(id) {
+      const defs = `
+        <defs>
+          <marker id="arrow-${id}" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b"/>
+          </marker>
+          <linearGradient id="muscle-${id}" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#10b981"/>
+            <stop offset="100%" stop-color="#06b6d4"/>
+          </linearGradient>
+        </defs>
+      `;
+
+      const scenes = {
+        // ================= TREINO A =================
+        'a1': `<!-- Supino Inclinado com Halteres (30º) -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Banco Inclinado 30° -->
+          <line x1="65" y1="125" x2="80" y2="108" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+          <line x1="145" y1="125" x2="145" y2="82" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+          <line x1="65" y1="108" x2="102" y2="108" stroke="#64748b" stroke-width="6" stroke-linecap="round"/>
+          <line x1="102" y1="108" x2="155" y2="75" stroke="#64748b" stroke-width="6" stroke-linecap="round"/>
+          <!-- Atleta no banco inclinado -->
+          <circle cx="163" cy="63" r="9" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M150 74 L104 103 L75 103 L62 123" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Destaque Peitoral Superior -->
+          <path d="M138 76 Q146 69 152 75 Q145 83 138 76 Z" fill="url(#muscle-${id})" stroke="#34d399" stroke-width="1"/>
+          <!-- Braços empurrando halteres -->
+          <path d="M144 74 L132 54 L138 35" fill="none" stroke="#cbd5e1" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Halter -->
+          <rect x="128" y="30" width="20" height="7" rx="2" fill="#f8fafc" stroke="#10b981" stroke-width="1.5"/>
+          <!-- Setas de empuxo -->
+          <line x1="118" y1="52" x2="118" y2="26" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3 2" marker-end="url(#arrow-${id})"/>
+          <line x1="156" y1="52" x2="156" y2="26" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3 2" marker-end="url(#arrow-${id})"/>`,
+
+        'a2': `<!-- Supino Reto (Barra ou Máquina) -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Banco Reto + Suporte Barra -->
+          <line x1="65" y1="102" x2="165" y2="102" stroke="#64748b" stroke-width="6" stroke-linecap="round"/>
+          <line x1="80" y1="102" x2="80" y2="125" stroke="#475569" stroke-width="4"/>
+          <line x1="150" y1="102" x2="150" y2="125" stroke="#475569" stroke-width="4"/>
+          <line x1="162" y1="45" x2="162" y2="125" stroke="#334155" stroke-width="3"/>
+          <!-- Atleta Deitado -->
+          <circle cx="172" cy="92" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M160 95 L102 95 L72 95 L62 123" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Peitoral Médio Destacado -->
+          <ellipse cx="143" cy="91" rx="9" ry="5" fill="url(#muscle-${id})" stroke="#34d399" stroke-width="1"/>
+          <!-- Braços e Barra -->
+          <path d="M144 92 L144 42" fill="none" stroke="#cbd5e1" stroke-width="5.5" stroke-linecap="round"/>
+          <line x1="126" y1="40" x2="162" y2="40" stroke="#94a3b8" stroke-width="3"/>
+          <circle cx="144" cy="40" r="10" fill="#1e293b" stroke="#10b981" stroke-width="2.5"/>
+          <circle cx="144" cy="40" r="3" fill="#10b981"/>
+          <!-- Setas verticais -->
+          <line x1="115" y1="68" x2="115" y2="36" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>
+          <line x1="175" y1="36" x2="175" y2="68" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3 2" marker-end="url(#arrow-${id})"/>`,
+
+        'a3': `<!-- Crossover Polia Alta (Peitoral Inferior) -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Torres do Crossover -->
+          <rect x="35" y="18" width="6" height="107" rx="2" fill="#334155"/>
+          <rect x="199" y="18" width="6" height="107" rx="2" fill="#334155"/>
+          <!-- Cabos Polia Alta -->
+          <line x1="41" y1="24" x2="103" y2="82" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <line x1="199" y1="24" x2="137" y2="82" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <!-- Atleta de frente -->
+          <circle cx="120" cy="36" r="9" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M104 52 L136 52 L130 84 L110 84 Z" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/>
+          <!-- Peitoral Inferior em Destaque -->
+          <path d="M107 62 Q114 68 120 62 Q126 68 133 62 L131 56 L109 56 Z" fill="url(#muscle-${id})"/>
+          <!-- Pernas -->
+          <path d="M113 84 L108 123 M127 84 L132 123" stroke="#94a3b8" stroke-width="6" stroke-linecap="round"/>
+          <!-- Braços fechando embaixo -->
+          <path d="M104 53 L95 70 L114 83" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M136 53 L145 70 L126 83" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Setas convergentes para baixo -->
+          <path d="M78 52 Q90 72 106 82" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>
+          <path d="M162 52 Q150 72 134 82" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'a4': `<!-- Crucifixo Máquina (Peck Deck) -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Estrutura Peck Deck -->
+          <rect x="115" y="20" width="10" height="105" rx="2" fill="#334155"/>
+          <line x1="80" y1="32" x2="160" y2="32" stroke="#475569" stroke-width="4"/>
+          <line x1="82" y1="32" x2="88" y2="75" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+          <line x1="158" y1="32" x2="152" y2="75" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+          <!-- Atleta Sentado -->
+          <circle cx="120" cy="42" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <rect x="106" y="53" width="28" height="32" rx="5" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/>
+          <!-- Miolo do Peitoral Destacado -->
+          <rect x="111" y="56" width="18" height="12" rx="3" fill="url(#muscle-${id})"/>
+          <path d="M111 85 L104 102 L104 123 M129 85 L136 102 L136 123" fill="none" stroke="#94a3b8" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Braços abraçando -->
+          <path d="M106 56 L88 64 L106 74" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M134 56 L152 64 L134 74" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Setas horizontais -->
+          <path d="M74 64 L98 64" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>
+          <path d="M166 64 L142 64" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'a5': `<!-- Desenvolvimento com Halteres -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Banco 80° -->
+          <line x1="115" y1="55" x2="115" y2="125" stroke="#475569" stroke-width="5" stroke-linecap="round"/>
+          <line x1="95" y1="98" x2="135" y2="98" stroke="#64748b" stroke-width="5" stroke-linecap="round"/>
+          <!-- Atleta -->
+          <circle cx="120" cy="44" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <rect x="107" y="55" width="26" height="36" rx="5" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/>
+          <!-- Ombros em destaque -->
+          <circle cx="105" cy="58" r="6" fill="url(#muscle-${id})"/>
+          <circle cx="135" cy="58" r="6" fill="url(#muscle-${id})"/>
+          <!-- Pernas -->
+          <path d="M110 91 L98 104 L98 123 M130 91 L142 104 L142 123" fill="none" stroke="#94a3b8" stroke-width="5.5" stroke-linecap="round"/>
+          <!-- Braços acima da cabeça -->
+          <path d="M105 58 L92 42 L102 22" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M135 58 L148 42 L138 22" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Halteres -->
+          <rect x="93" y="17" width="18" height="6" rx="2" fill="#f8fafc" stroke="#10b981" stroke-width="1.5"/>
+          <rect x="129" y="17" width="18" height="6" rx="2" fill="#f8fafc" stroke="#10b981" stroke-width="1.5"/>
+          <!-- Setas verticais -->
+          <line x1="78" y1="48" x2="78" y2="20" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>
+          <line x1="162" y1="48" x2="162" y2="20" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'a6': `<!-- Elevação Lateral -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Atleta em Pé -->
+          <circle cx="120" cy="34" r="9" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M106 49 L134 49 L129 83 L111 83 Z" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/>
+          <!-- Deltóide Lateral em Destaque -->
+          <circle cx="104" cy="51" r="6.5" fill="url(#muscle-${id})"/>
+          <circle cx="136" cy="51" r="6.5" fill="url(#muscle-${id})"/>
+          <!-- Pernas -->
+          <path d="M114 83 L111 123 M126 83 L129 123" stroke="#94a3b8" stroke-width="6" stroke-linecap="round"/>
+          <!-- Braços abertos em T -->
+          <path d="M104 51 L62 51" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+          <path d="M136 51 L178 51" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+          <!-- Halteres -->
+          <rect x="55" y="45" width="7" height="14" rx="2" fill="#f8fafc" stroke="#10b981" stroke-width="1.5"/>
+          <rect x="178" y="45" width="7" height="14" rx="2" fill="#f8fafc" stroke="#10b981" stroke-width="1.5"/>
+          <!-- Arcos de Elevação -->
+          <path d="M84 85 Q62 72 60 57" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3 2" marker-end="url(#arrow-${id})"/>
+          <path d="M156 85 Q178 72 180 57" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3 2" marker-end="url(#arrow-${id})"/>`,
+
+        'a7': `<!-- Elevação Frontal -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Atleta de Perfil -->
+          <circle cx="105" cy="34" r="9" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M105 45 L105 84 L100 123 M105 84 L112 123" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Deltóide Anterior Destacado -->
+          <circle cx="110" cy="50" r="6.5" fill="url(#muscle-${id})"/>
+          <!-- Braço estendido à frente -->
+          <path d="M110 50 L158 50" stroke="#cbd5e1" stroke-width="5.5" stroke-linecap="round"/>
+          <!-- Halter -->
+          <rect x="155" y="43" width="8" height="15" rx="2" fill="#f8fafc" stroke="#10b981" stroke-width="1.5"/>
+          <!-- Arco frontal -->
+          <path d="M126 88 Q154 78 158 58" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3 2" marker-end="url(#arrow-${id})"/>`,
+
+        'a8': `<!-- Tríceps Testa -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Banco -->
+          <line x1="65" y1="102" x2="165" y2="102" stroke="#64748b" stroke-width="6" stroke-linecap="round"/>
+          <line x1="80" y1="102" x2="80" y2="125" stroke="#475569" stroke-width="4"/>
+          <line x1="150" y1="102" x2="150" y2="125" stroke="#475569" stroke-width="4"/>
+          <!-- Atleta Deitado -->
+          <circle cx="165" cy="92" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M153 95 L98 95 L72 95 L62 123" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Braço fixo e Antebraço flexionando -->
+          <path d="M145 92 L145 60" stroke="#94a3b8" stroke-width="5.5" stroke-linecap="round"/>
+          <!-- Cabeça Longa Tríceps em Destaque -->
+          <path d="M148 88 L148 63" stroke="url(#muscle-${id})" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M145 60 L172 68" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="175" cy="69" r="6" fill="#f8fafc" stroke="#10b981" stroke-width="2"/>
+          <!-- Arco de extensão do cotovelo -->
+          <path d="M174 58 Q166 36 148 34" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'a9': `<!-- Tríceps Pulley (Corda) -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Torre Polia -->
+          <rect x="160" y="16" width="8" height="109" rx="2" fill="#334155"/>
+          <line x1="138" y1="20" x2="164" y2="20" stroke="#475569" stroke-width="4"/>
+          <!-- Cabo e Corda -->
+          <line x1="140" y1="20" x2="140" y2="74" stroke="#64748b" stroke-width="2"/>
+          <path d="M140 74 L132 85 M140 74 L147 85" stroke="#f8fafc" stroke-width="3" stroke-linecap="round"/>
+          <!-- Atleta -->
+          <circle cx="105" cy="36" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M105 47 L102 84 L96 123 M102 84 L110 123" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Tríceps em destaque -->
+          <path d="M102 52 L106 72" stroke="url(#muscle-${id})" stroke-width="5" stroke-linecap="round"/>
+          <!-- Braço e Antebraço estendendo -->
+          <path d="M106 50 L110 72 L136 80" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Seta para baixo -->
+          <line x1="125" y1="58" x2="125" y2="92" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'a10': `<!-- Prancha Frontal -->
+          <line x1="20" y1="115" x2="220" y2="115" stroke="#1e293b" stroke-width="2.5"/>
+          <!-- Colchonete -->
+          <rect x="35" y="111" width="170" height="4" rx="2" fill="#334155"/>
+          <!-- Corpo em Linha Reta -->
+          <circle cx="176" cy="83" r="8" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <!-- Antebraço apoiado -->
+          <path d="M164 88 L164 110 L182 110" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Tronco e Pernas -->
+          <path d="M164 88 L112 90 L52 108" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Core / Transverso em Destaque -->
+          <ellipse cx="132" cy="92" rx="20" ry="5.5" fill="url(#muscle-${id})" stroke="#34d399" stroke-width="1"/>
+          <!-- Setas de tensão isométrica -->
+          <line x1="132" y1="108" x2="132" y2="99" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>
+          <line x1="110" y1="74" x2="154" y2="74" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4 3"/>`,
+
+        'a11': `<!-- Cardio Pós-Treino (Esteira Inclinada) -->
+          <line x1="20" y1="125" x2="220" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Esteira Inclinada 8% -->
+          <line x1="55" y1="120" x2="175" y2="96" stroke="#475569" stroke-width="7" stroke-linecap="round"/>
+          <line x1="168" y1="98" x2="178" y2="45" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+          <line x1="162" y1="45" x2="184" y2="42" stroke="#10b981" stroke-width="3.5" stroke-linecap="round"/>
+          <!-- Atleta Caminhando Subida -->
+          <circle cx="122" cy="36" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M120 47 L115 76" stroke="#94a3b8" stroke-width="7" stroke-linecap="round"/>
+          <!-- Passada -->
+          <path d="M115 76 L132 88 L138 100" fill="none" stroke="url(#muscle-${id})" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M115 76 L96 95 L86 111" fill="none" stroke="#cbd5e1" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Seta de inclinação -->
+          <line x1="65" y1="104" x2="145" y2="88" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 2" marker-end="url(#arrow-${id})"/>`,
+
+        // ================= TREINO B =================
+        'b1': `<!-- Puxada Alta (Pegada Aberta) -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Máquina Pulley -->
+          <line x1="120" y1="14" x2="120" y2="40" stroke="#64748b" stroke-width="2"/>
+          <path d="M72 42 Q120 38 168 42" fill="none" stroke="#f8fafc" stroke-width="3.5" stroke-linecap="round"/>
+          <!-- Atleta de Costas -->
+          <circle cx="120" cy="48" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M100 60 L140 60 L131 94 L109 94 Z" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/>
+          <!-- Grande Dorsal em V destacado -->
+          <path d="M102 62 L117 88 L111 92 L100 68 Z" fill="url(#muscle-${id})"/>
+          <path d="M138 62 L123 88 L129 92 L140 68 Z" fill="url(#muscle-${id})"/>
+          <!-- Braços segurando barra aberta -->
+          <path d="M100 61 L82 54 L76 42" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M140 61 L158 54 L164 42" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Banco -->
+          <rect x="102" y="95" width="36" height="5" rx="2" fill="#64748b"/>
+          <line x1="120" y1="100" x2="120" y2="125" stroke="#475569" stroke-width="4"/>
+          <!-- Setas descendentes -->
+          <line x1="64" y1="45" x2="64" y2="75" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>
+          <line x1="176" y1="45" x2="176" y2="75" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'b2': `<!-- Remada Curvada ou Cavalinho -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Atleta com tronco inclinado a 45º -->
+          <circle cx="156" cy="48" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M146 56 L102 76 L92 123 M102 76 L106 123" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Espessura Costas / Trapézio em destaque -->
+          <path d="M142 54 L112 67 L115 73 L145 60 Z" fill="url(#muscle-${id})"/>
+          <!-- Braço puxando barra -->
+          <path d="M138 60 L124 72 L134 90" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="134" cy="94" r="9" fill="#1e293b" stroke="#10b981" stroke-width="2.5"/>
+          <!-- Seta de remada para cima -->
+          <line x1="152" y1="98" x2="138" y2="70" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'b3': `<!-- Remada Baixa com Triângulo -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Máquina Remada -->
+          <rect x="40" y="75" width="10" height="50" rx="2" fill="#334155"/>
+          <rect x="92" y="106" width="60" height="5" rx="2" fill="#64748b"/>
+          <line x1="122" y1="111" x2="122" y2="125" stroke="#475569" stroke-width="4"/>
+          <!-- Cabo -->
+          <line x1="50" y1="86" x2="108" y2="86" stroke="#64748b" stroke-width="2"/>
+          <!-- Atleta Sentado -->
+          <circle cx="138" cy="52" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M136 63 L132 102 L72 96" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Miolo das costas destacado -->
+          <rect x="133" y="65" width="5" height="22" rx="2" fill="url(#muscle-${id})"/>
+          <!-- Braço puxando até o abdômen -->
+          <path d="M134 66 L146 84 L112 86" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Seta horizontal para trás -->
+          <line x1="82" y1="74" x2="122" y2="74" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'b4': `<!-- Pullover no Cabo (Corda) -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Polia Alta -->
+          <rect x="42" y="16" width="8" height="109" rx="2" fill="#334155"/>
+          <line x1="50" y1="22" x2="112" y2="76" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 2"/>
+          <!-- Atleta inclinado -->
+          <circle cx="132" cy="44" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M136 54 L148 86 L144 123 M148 86 L156 123" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Dorsal Baixa e Serrátil -->
+          <path d="M134 62 L142 84 L148 82 L140 60 Z" fill="url(#muscle-${id})"/>
+          <!-- Braços estendidos descendo em arco -->
+          <path d="M134 55 L112 78" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+          <!-- Arco de Pullover -->
+          <path d="M90 36 Q86 64 106 82" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'b5': `<!-- Crucifixo Invertido -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Atleta inclinado visto de frente/topo -->
+          <circle cx="120" cy="48" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M104 58 L136 58 L131 86 L109 86 Z" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/>
+          <!-- Deltóide Posterior em destaque -->
+          <circle cx="102" cy="59" r="6" fill="url(#muscle-${id})"/>
+          <circle cx="138" cy="59" r="6" fill="url(#muscle-${id})"/>
+          <path d="M113 86 L108 123 M127 86 L132 123" stroke="#94a3b8" stroke-width="6" stroke-linecap="round"/>
+          <!-- Braços abrindo para trás -->
+          <path d="M102 59 L60 55" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+          <path d="M138 59 L180 55" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+          <rect x="54" y="49" width="6" height="12" rx="2" fill="#f8fafc" stroke="#10b981" stroke-width="1.5"/>
+          <rect x="180" y="49" width="6" height="12" rx="2" fill="#f8fafc" stroke="#10b981" stroke-width="1.5"/>
+          <!-- Arcos para cima e para trás -->
+          <path d="M84 86 Q62 76 58 63" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>
+          <path d="M156 86 Q178 76 182 63" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'b6': `<!-- Rosca Direta (Barra W) -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Atleta em pé -->
+          <circle cx="110" cy="34" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M110 45 L110 85 L105 123 M110 85 L116 123" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Bíceps destacado -->
+          <ellipse cx="114" cy="60" rx="4.5" ry="9" fill="url(#muscle-${id})"/>
+          <!-- Braço + Antebraço flexionado -->
+          <path d="M112 49 L112 72 L138 54" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="141" cy="52" r="7" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+          <!-- Arco de flexão -->
+          <path d="M138 82 Q148 70 144 59" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'b7': `<!-- Rosca Martelo (Pegada Neutra) -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Atleta -->
+          <circle cx="110" cy="34" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M110 45 L110 85 L105 123 M110 85 L116 123" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Braquial e Antebraço destacados -->
+          <ellipse cx="114" cy="61" rx="4.5" ry="8.5" fill="url(#muscle-${id})"/>
+          <path d="M112 72 L138 56" stroke="url(#muscle-${id})" stroke-width="5.5" stroke-linecap="round"/>
+          <path d="M112 49 L112 72" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+          <!-- Halter na vertical (pegada martelo) -->
+          <rect x="135" y="45" width="7" height="19" rx="2" fill="#f8fafc" stroke="#10b981" stroke-width="1.5"/>
+          <path d="M136 84 Q148 72 145 62" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'b8': `<!-- Rosca Inclinada no Banco 45º -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Banco 45º -->
+          <line x1="75" y1="106" x2="115" y2="106" stroke="#64748b" stroke-width="5" stroke-linecap="round"/>
+          <line x1="115" y1="106" x2="155" y2="66" stroke="#64748b" stroke-width="5" stroke-linecap="round"/>
+          <line x1="145" y1="76" x2="145" y2="125" stroke="#475569" stroke-width="4"/>
+          <!-- Atleta recostado -->
+          <circle cx="158" cy="54" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M148 64 L112 101 L84 101 L74 123" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Braço estendido para trás do tronco -->
+          <path d="M142 68 L146 92 L124 84" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Cabeça Longa do Bíceps Alongada -->
+          <line x1="145" y1="70" x2="148" y2="90" stroke="url(#muscle-${id})" stroke-width="4.5" stroke-linecap="round"/>
+          <rect x="116" y="79" width="12" height="6" rx="2" fill="#f8fafc" stroke="#10b981" stroke-width="1.5"/>
+          <path d="M142 106 Q128 102 124 89" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'b9': `<!-- Abdominal Bicicleta / Russian Twist -->
+          <line x1="20" y1="120" x2="220" y2="120" stroke="#1e293b" stroke-width="2"/>
+          <rect x="35" y="116" width="170" height="4" rx="2" fill="#334155"/>
+          <!-- Atleta em V-Sit / Bicicleta -->
+          <circle cx="154" cy="64" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M146 72 L120 108 L92 84 L62 96" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Outra perna estendida -->
+          <path d="M120 108 L64 108" stroke="#64748b" stroke-width="5.5" stroke-linecap="round"/>
+          <!-- Oblíquos em Destaque -->
+          <ellipse cx="132" cy="92" rx="10" ry="6" transform="rotate(-35 132 92)" fill="url(#muscle-${id})"/>
+          <!-- Cotovelo cruzando em direção ao joelho -->
+          <path d="M144 74 L122 76 L98 84" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Setas de rotação -->
+          <path d="M105 64 Q120 56 135 64" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'b10': `<!-- Cardio Pós-Treino (Simulador de Escada) -->
+          <line x1="20" y1="125" x2="220" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Degraus da Escada -->
+          <path d="M65 123 L65 110 L92 110 L92 96 L119 96 L119 82 L146 82 L146 68 L173 68" fill="none" stroke="#475569" stroke-width="4" stroke-linejoin="round"/>
+          <line x1="173" y1="68" x2="173" y2="38" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+          <!-- Atleta Subindo Degraus -->
+          <circle cx="122" cy="30" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M120 41 L115 68" stroke="#94a3b8" stroke-width="7" stroke-linecap="round"/>
+          <path d="M115 68 L134 68 L136 82" fill="none" stroke="url(#muscle-${id})" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M115 68 L104 88 L104 96" fill="none" stroke="#cbd5e1" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="76" y1="92" x2="128" y2="54" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3 2" marker-end="url(#arrow-${id})"/>`,
+
+        // ================= TREINO C =================
+        'c1': `<!-- Agachamento Livre -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Atleta Agachado a 90º -->
+          <circle cx="128" cy="46" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <!-- Barra nas costas -->
+          <circle cx="118" cy="54" r="9" fill="#1e293b" stroke="#10b981" stroke-width="2.5"/>
+          <!-- Tronco levemente inclinado -->
+          <path d="M122 56 L102 88" stroke="#94a3b8" stroke-width="7" stroke-linecap="round"/>
+          <!-- Coxa (Quadríceps + Glúteo em destaque) -->
+          <path d="M102 88 L136 90" stroke="url(#muscle-${id})" stroke-width="7.5" stroke-linecap="round"/>
+          <!-- Canela -->
+          <path d="M136 90 L126 123" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+          <!-- Setas verticais -->
+          <line x1="78" y1="62" x2="78" y2="96" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3 2" marker-end="url(#arrow-${id})"/>
+          <line x1="164" y1="96" x2="164" y2="62" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'c2': `<!-- Leg Press 45º -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Encosto e Trilho 45º -->
+          <line x1="55" y1="78" x2="96" y2="112" stroke="#64748b" stroke-width="6" stroke-linecap="round"/>
+          <line x1="115" y1="105" x2="178" y2="42" stroke="#334155" stroke-width="4" stroke-dasharray="4 3"/>
+          <!-- Plataforma -->
+          <line x1="154" y1="34" x2="176" y2="56" stroke="#94a3b8" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="174" cy="36" r="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+          <!-- Atleta -->
+          <circle cx="66" cy="64" r="8" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M72 72 L102 102" stroke="#94a3b8" stroke-width="7" stroke-linecap="round"/>
+          <!-- Pernas empurrando plataforma -->
+          <path d="M102 102 L124 72" stroke="url(#muscle-${id})" stroke-width="7" stroke-linecap="round"/>
+          <path d="M124 72 L162 46" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+          <!-- Seta diagonal 45º -->
+          <line x1="118" y1="54" x2="146" y2="26" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'c3': `<!-- Stiff com Halteres ou Barra -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Atleta com quadril para trás e tronco paralelo -->
+          <circle cx="164" cy="66" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M153 68 L104 68" stroke="#94a3b8" stroke-width="7" stroke-linecap="round"/>
+          <!-- Perna quase estendida com Posterior e Glúteo em destaque -->
+          <path d="M104 68 L112 123" stroke="#cbd5e1" stroke-width="6.5" stroke-linecap="round"/>
+          <path d="M100 69 L105 98" stroke="url(#muscle-${id})" stroke-width="5.5" stroke-linecap="round"/>
+          <!-- Braços descendo com carga -->
+          <path d="M144 68 L144 102" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="144" cy="105" r="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+          <!-- Seta de subida do quadril -->
+          <path d="M164 88 Q168 62 152 44" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'c4': `<!-- Afundo / Passada com Halteres -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Atleta em Base Unilateral -->
+          <circle cx="122" cy="38" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M122 49 L120 82" stroke="#94a3b8" stroke-width="7" stroke-linecap="round"/>
+          <!-- Perna da frente (90º) -->
+          <path d="M120 82 L152 84 L152 123" fill="none" stroke="url(#muscle-${id})" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Perna de trás flexionando -->
+          <path d="M120 82 L94 108 L74 114" fill="none" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Braços segurando halteres -->
+          <path d="M121 53 L121 82" stroke="#cbd5e1" stroke-width="4.5" stroke-linecap="round"/>
+          <rect x="115" y="81" width="13" height="6" rx="2" fill="#f8fafc" stroke="#10b981" stroke-width="1.5"/>
+          <!-- Setas verticais -->
+          <line x1="172" y1="64" x2="172" y2="96" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3 2" marker-end="url(#arrow-${id})"/>
+          <line x1="182" y1="96" x2="182" y2="64" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'c5': `<!-- Cadeira Extensora -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Banco Extensora -->
+          <path d="M72 56 L82 94 L126 94" fill="none" stroke="#64748b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="96" y1="94" x2="96" y2="125" stroke="#475569" stroke-width="4"/>
+          <!-- Atleta Sentado -->
+          <circle cx="84" cy="44" r="8" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M84 54 L90 88" stroke="#94a3b8" stroke-width="7" stroke-linecap="round"/>
+          <!-- Coxa e Perna estendendo -->
+          <path d="M90 88 L126 88" stroke="url(#muscle-${id})" stroke-width="7" stroke-linecap="round"/>
+          <path d="M126 88 L166 84" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+          <!-- Rolo no tornozelo -->
+          <circle cx="162" cy="79" r="5" fill="#f8fafc" stroke="#10b981" stroke-width="2"/>
+          <!-- Arco de extensão -->
+          <path d="M138 118 Q160 112 166 93" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'c6': `<!-- Mesa Flexora -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Mesa Flexora -->
+          <path d="M62 84 L112 84 L148 96" fill="none" stroke="#64748b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="80" y1="84" x2="80" y2="125" stroke="#475569" stroke-width="4"/>
+          <line x1="136" y1="92" x2="136" y2="125" stroke="#475569" stroke-width="4"/>
+          <!-- Atleta de bruços -->
+          <circle cx="62" cy="72" r="8" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M72 78 L112 78 L142 88" fill="none" stroke="#94a3b8" stroke-width="6.5" stroke-linecap="round"/>
+          <!-- Posterior destacado -->
+          <path d="M114 75 L140 84" stroke="url(#muscle-${id})" stroke-width="5" stroke-linecap="round"/>
+          <!-- Perna flexionando para cima -->
+          <path d="M142 88 L158 54" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="162" cy="56" r="5" fill="#f8fafc" stroke="#10b981" stroke-width="2"/>
+          <!-- Arco de flexão -->
+          <path d="M178 86 Q178 66 168 54" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'c7': `<!-- Panturrilha em Pé -->
+          <line x1="25" y1="125" x2="215" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Step -->
+          <rect x="94" y="114" width="44" height="11" rx="2" fill="#475569"/>
+          <!-- Atleta na ponta dos pés -->
+          <circle cx="116" cy="28" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M116 39 L116 74 L116 96" stroke="#94a3b8" stroke-width="7" stroke-linecap="round"/>
+          <!-- Panturrilha destacada -->
+          <ellipse cx="112" cy="90" rx="4.5" ry="9" fill="url(#muscle-${id})"/>
+          <!-- Pé na ponta -->
+          <path d="M116 96 L116 105 L126 113" fill="none" stroke="#cbd5e1" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Seta vertical para cima -->
+          <line x1="142" y1="106" x2="142" y2="74" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'c8': `<!-- Abdominal Supra + Infra Combinado -->
+          <line x1="20" y1="120" x2="220" y2="120" stroke="#1e293b" stroke-width="2"/>
+          <rect x="35" y="116" width="170" height="4" rx="2" fill="#334155"/>
+          <!-- Atleta fazendo Canivete / Supra+Infra -->
+          <circle cx="158" cy="78" r="8" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M150 86 L124 111 L86 78" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Reto Abdominal Supra e Infra Destacado -->
+          <path d="M142 92 L124 108 L104 92" fill="none" stroke="url(#muscle-${id})" stroke-width="5.5" stroke-linecap="round"/>
+          <!-- Braços acompanhando -->
+          <path d="M146 84 L120 74" stroke="#cbd5e1" stroke-width="4.5" stroke-linecap="round"/>
+          <!-- Setas convergentes -->
+          <path d="M168 102 Q166 86 156 76" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>
+          <path d="M64 102 Q68 86 80 76" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`,
+
+        'c9': `<!-- Cardio Pós-Treino (Bike Ergométrica) -->
+          <line x1="20" y1="125" x2="220" y2="125" stroke="#1e293b" stroke-width="2"/>
+          <!-- Estrutura da Bike -->
+          <path d="M75 123 L95 92 L145 92 L162 123 M95 92 L88 74 M145 92 L152 54 L138 50" fill="none" stroke="#475569" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="120" cy="96" r="14" fill="none" stroke="#64748b" stroke-width="3"/>
+          <!-- Atleta Pedalando -->
+          <circle cx="108" cy="36" r="8.5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+          <path d="M105 46 L90 72" stroke="#94a3b8" stroke-width="7" stroke-linecap="round"/>
+          <path d="M105 48 L138 50" stroke="#cbd5e1" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M90 72 L116 82 L124 104" fill="none" stroke="url(#muscle-${id})" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Seta circular de pedalada -->
+          <path d="M104 114 A 18 18 0 1 1 136 110" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-${id})"/>`
+      };
+
+      return `
+        <svg viewBox="0 0 240 140" class="w-full h-36 sm:h-40 select-none" xmlns="http://www.w3.org/2000/svg">
+          ${defs}
+          ${scenes[id] || ''}
+        </svg>
+      `;
+    }
+
+    const EXERCISES = [
+      // TREINO A
+      {
+        id: 'a1', workout: 'A', order: 1,
+        name: 'Supino Inclinado com Halteres (30º)',
+        muscle: 'Peitoral Superior (Clavicular)',
+        setsReps: '3 x 12', rest: 60,
+        tip: 'Mantenha os cotovelos levemente fechados (45º em relação ao tronco) e controle a descida por 2 segundos.'
+      },
+      {
+        id: 'a2', workout: 'A', order: 2,
+        name: 'Supino Reto (Barra ou Máquina)',
+        muscle: 'Peitoral Médio (Esternal)',
+        setsReps: '3 x 12', rest: 60,
+        tip: 'Escápulas retraídas contra o banco. Empurre de forma explosiva e desça até a linha média do peito.'
+      },
+      {
+        id: 'a3', workout: 'A', order: 3,
+        name: 'Crossover Polia Alta',
+        muscle: 'Peitoral Inferior (Costal)',
+        setsReps: '3 x 12-15', rest: 45,
+        tip: 'Polias no topo, dê um passo à frente, incline levemente o tronco e feche as mãos na linha do quadril.'
+      },
+      {
+        id: 'a4', workout: 'A', order: 4,
+        name: 'Crucifixo Máquina (Peck Deck)',
+        muscle: 'Definição e Miolo do Peitoral',
+        setsReps: '3 x 15', rest: 45,
+        tip: 'Segure a contração máxima por 1 segundo no centro antes de abrir os braços de forma controlada.'
+      },
+      {
+        id: 'a5', workout: 'A', order: 5,
+        name: 'Desenvolvimento com Halteres',
+        muscle: 'Deltóide Anterior e Lateral',
+        setsReps: '3 x 12', rest: 60,
+        tip: 'Abdômen contraído para não arquear a lombar. Suba os halteres sem bater um no outro no topo.'
+      },
+      {
+        id: 'a6', workout: 'A', order: 6,
+        name: 'Elevação Lateral',
+        muscle: 'Deltóide Lateral (Largura)',
+        setsReps: '3 x 15', rest: 45,
+        tip: 'Suba os cotovelos até a altura dos ombros, mantendo os punhos neutros e sem balançar o tronco.'
+      },
+      {
+        id: 'a7', workout: 'A', order: 7,
+        name: 'Elevação Frontal',
+        muscle: 'Deltóide Anterior',
+        setsReps: '2 x 15', rest: 45,
+        tip: 'Movimento contínuo até a linha dos olhos, evitando impulso com o quadril.'
+      },
+      {
+        id: 'a8', workout: 'A', order: 8,
+        name: 'Tríceps Testa (Barra W ou Halteres)',
+        muscle: 'Cabeça Longa do Tríceps',
+        setsReps: '3 x 12', rest: 45,
+        tip: 'Mantenha os cotovelos apontados para o teto e fixos; mova apenas os antebraços.'
+      },
+      {
+        id: 'a9', workout: 'A', order: 9,
+        name: 'Tríceps Pulley (Corda)',
+        muscle: 'Cabeças Lateral e Medial',
+        setsReps: '3 x 15', rest: 45,
+        tip: 'Abra as pontas da corda no final do movimento para espremer completamente o tríceps.'
+      },
+      {
+        id: 'a10', workout: 'A', order: 10,
+        name: 'Prancha Frontal',
+        muscle: 'Transverso do Abdômen (Core)',
+        setsReps: '3 x 45-60s', rest: 45,
+        tip: 'Contraia glúteos e abdômen como se estivesse fechando um zíper apertado; não deixe o quadril cair.'
+      },
+      {
+        id: 'a11', workout: 'A', order: 11,
+        name: 'Cardio Pós-Treino (Esteira Inclinada)',
+        muscle: 'Queima Calórica e Resistência',
+        setsReps: '20 min', rest: 0, isCardio: true,
+        tip: 'Ajuste a inclinação entre 6% e 8% com velocidade firme (5.5 a 6.0 km/h) sem segurar no painel.'
+      },
+
+      // TREINO B
+      {
+        id: 'b1', workout: 'B', order: 1,
+        name: 'Puxada Alta (Pegada Aberta)',
+        muscle: 'Largura Superior (Grande Dorsal)',
+        setsReps: '3 x 12', rest: 60,
+        tip: 'Inicie o movimento abaixando os ombros e puxe a barra em direção à parte superior do peito.'
+      },
+      {
+        id: 'b2', workout: 'B', order: 2,
+        name: 'Remada Curvada ou Cavalinho',
+        muscle: 'Espessura e Força de Tronco',
+        setsReps: '3 x 12', rest: 60,
+        tip: 'Coluna neutra e peito aberto. Puxe a carga em direção ao umbigo fechando as escápulas.'
+      },
+      {
+        id: 'b3', workout: 'B', order: 3,
+        name: 'Remada Baixa com Triângulo',
+        muscle: 'Miolo das Costas e Postura',
+        setsReps: '3 x 12-15', rest: 45,
+        tip: 'Evite jogar o tronco muito para trás; puxe com os cotovelos rentes ao corpo.'
+      },
+      {
+        id: 'b4', workout: 'B', order: 4,
+        name: 'Pullover no Cabo (Corda)',
+        muscle: 'Dorsal Baixa e Serrátil',
+        setsReps: '3 x 15', rest: 45,
+        tip: 'Braços quase estendidos; leve a corda da altura do rosto até a linha das coxas usando as dorsais.'
+      },
+      {
+        id: 'b5', workout: 'B', order: 5,
+        name: 'Crucifixo Invertido',
+        muscle: 'Deltóide Posterior',
+        setsReps: '3 x 15', rest: 45,
+        tip: 'Abra os braços para trás focando na parte posterior dos ombros, sem juntar demais as escápulas.'
+      },
+      {
+        id: 'b6', workout: 'B', order: 6,
+        name: 'Rosca Direta (Barra W)',
+        muscle: 'Bíceps Geral (Curta e Longa)',
+        setsReps: '3 x 12', rest: 45,
+        tip: 'Cotovelos colados ao lado do tronco durante toda a subida e descida da barra.'
+      },
+      {
+        id: 'b7', workout: 'B', order: 7,
+        name: 'Rosca Martelo',
+        muscle: 'Braquial e Antebraço',
+        setsReps: '3 x 12-15', rest: 45,
+        tip: 'Pegada neutra (palmas voltadas uma para a outra) para dar densidade ao braço e antebraço.'
+      },
+      {
+        id: 'b8', workout: 'B', order: 8,
+        name: 'Rosca Inclinada no Banco 45º',
+        muscle: 'Alongamento e Pico do Bíceps',
+        setsReps: '2 x 15', rest: 45,
+        tip: 'Deixe os braços caírem verticalmente atrás da linha do tronco para alongamento máximo.'
+      },
+      {
+        id: 'b9', workout: 'B', order: 9,
+        name: 'Abdominal Bicicleta / Russian Twist',
+        muscle: 'Oblíquos (Linha Lateral)',
+        setsReps: '3 x 20 total', rest: 45,
+        tip: 'Gire o tronco levando o ombro em direção ao joelho oposto sem puxar o pescoço.'
+      },
+      {
+        id: 'b10', workout: 'B', order: 10,
+        name: 'Cardio Pós-Treino (Esteira / Escada)',
+        muscle: 'Queima Calórica e Resistência',
+        setsReps: '20 min', rest: 0, isCardio: true,
+        tip: 'Mantenha ritmo constante no simulador de escada ou esteira inclinada mantendo a frequência cardíaca elevada.'
+      },
+
+      // TREINO C
+      {
+        id: 'c1', workout: 'C', order: 1,
+        name: 'Agachamento (Livre ou Smith)',
+        muscle: 'Quadríceps e Glúteos',
+        setsReps: '3 x 12', rest: 75,
+        tip: 'Pés na largura dos ombros, joelhos acompanhando a ponta dos pés e descida controlada até 90º.'
+      },
+      {
+        id: 'c2', workout: 'C', order: 2,
+        name: 'Leg Press 45º',
+        muscle: 'Quadríceps e Adutores',
+        setsReps: '3 x 12-15', rest: 60,
+        tip: 'Não trave completamente os joelhos no topo e evite tirar o quadril/lombar do encosto na descida.'
+      },
+      {
+        id: 'c3', workout: 'C', order: 3,
+        name: 'Stiff com Halteres ou Barra',
+        muscle: 'Posterior de Coxa e Glúteos',
+        setsReps: '3 x 12', rest: 60,
+        tip: 'Joelhos semi-flexionados e fixos; empurre o quadril para trás mantendo a coluna reta.'
+      },
+      {
+        id: 'c4', workout: 'C', order: 4,
+        name: 'Afundo / Passada com Halteres',
+        muscle: 'Resistência Geral de Pernas e Glúteos',
+        setsReps: '3 x 12 cada', rest: 60,
+        tip: 'Dê um passo firme e desça o joelho de trás em direção ao chão mantendo o tronco ereto.'
+      },
+      {
+        id: 'c5', workout: 'C', order: 5,
+        name: 'Cadeira Extensora',
+        muscle: 'Definição do Quadríceps',
+        setsReps: '3 x 15', rest: 45,
+        tip: 'Segure 1 segundo no topo com os joelhos estendidos para maximizar o estímulo metabólico.'
+      },
+      {
+        id: 'c6', workout: 'C', order: 6,
+        name: 'Mesa ou Cadeira Flexora',
+        muscle: 'Isolamento de Posterior',
+        setsReps: '3 x 15', rest: 45,
+        tip: 'Mantenha o quadril pressionado contra o banco durante toda a flexão dos joelhos.'
+      },
+      {
+        id: 'c7', workout: 'C', order: 7,
+        name: 'Panturrilha em Pé + Sentada',
+        muscle: 'Panturrilha Completa',
+        setsReps: '4 x 15-20', rest: 40,
+        tip: 'Amplitude máxima: alongue bem o calcanhar embaixo e suba o máximo possível na ponta dos pés.'
+      },
+      {
+        id: 'c8', workout: 'C', order: 8,
+        name: 'Abdominal Supra + Infra',
+        muscle: 'Reto Abdominal Superior e Inferior',
+        setsReps: '3 x 15 cada', rest: 45,
+        tip: 'Combine 15 repetições de crunch supra seguidas imediatamente de 15 elevações de quadril.'
+      },
+      {
+        id: 'c9', workout: 'C', order: 9,
+        name: 'Cardio Pós-Treino (Esteira / Bike)',
+        muscle: 'Queima Calórica Máxima',
+        setsReps: '25 min', rest: 0, isCardio: true,
+        tip: 'Finalize a semana com 25 minutos em cadência moderada-intensa para otimizar a redução abdominal.'
+      }
+    ];
+
+    // =========================================================================
+    // ESTADO E PERSISTÊNCIA (LOCALSTORAGE)
+    // =========================================================================
+    let activeTab = 'A';
+    let completedSet = new Set(JSON.parse(localStorage.getItem('abc_completed_v1') || '[]'));
+
+    function saveCompleted() {
+      localStorage.setItem('abc_completed_v1', JSON.stringify([...completedSet]));
+      updateProgress();
+    }
+
+    function toggleComplete(id) {
+      if (completedSet.has(id)) {
+        completedSet.delete(id);
+      } else {
+        completedSet.add(id);
+        const ex = EXERCISES.find(e => e.id === id);
+        if (ex && ex.rest > 0) {
+          startTimer(ex.rest, `Descanso: ${ex.name}`);
+        }
+      }
+      saveCompleted();
+      renderExercises();
+    }
+
+    function resetProgress() {
+      if (activeTab === 'ALL') {
+        completedSet.clear();
+      } else {
+        EXERCISES.filter(e => e.workout === activeTab).forEach(e => completedSet.delete(e.id));
+      }
+      saveCompleted();
+      renderExercises();
+      showToast('Marcações reiniciadas!');
+    }
+
+    function updateProgress() {
+      const list = activeTab === 'ALL'
+        ? EXERCISES
+        : EXERCISES.filter(e => e.workout === activeTab);
+
+      const done = list.filter(e => completedSet.has(e.id)).length;
+      const pct = list.length ? Math.round((done / list.length) * 100) : 0;
+
+      document.getElementById('progressLabel').textContent =
+        activeTab === 'ALL' ? `Geral (${done}/${list.length})` : `Treino ${activeTab} (${done}/${list.length})`;
+      document.getElementById('progressPercent').textContent = `${pct}%`;
+      document.getElementById('progressBar').style.width = `${pct}%`;
+    }
+
+    // =========================================================================
+    // NAVEGAÇÃO E RENDERIZAÇÃO
+    // =========================================================================
+    function switchTab(tab) {
+      activeTab = tab;
+
+      // Atualiza estilos dos botões
+      ['A', 'B', 'C', 'ALL'].forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if (t === tab) {
+          btn.className = 'tab-btn py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1 bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 shadow-lg shadow-emerald-500/20';
+        } else {
+          btn.className = 'tab-btn py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1 text-slate-400 hover:text-white hover:bg-slate-800/70';
+        }
+      });
+
+      // Atualiza cabeçalho contextual
+      const meta = WORKOUT_META[tab];
+      document.getElementById('headerBadge').textContent = meta.badge;
+      document.getElementById('headerTitle').textContent = meta.title;
+      document.getElementById('headerDesc').textContent = meta.desc;
+
+      updateProgress();
+      renderExercises();
+    }
+
+    function renderExercises() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const grid = document.getElementById('exercisesGrid');
+
+      const filtered = EXERCISES.filter(ex => {
+        const matchTab = activeTab === 'ALL' || ex.workout === activeTab;
+        const matchQuery = !query ||
+          ex.name.toLowerCase().includes(query) ||
+          ex.muscle.toLowerCase().includes(query) ||
+          ex.tip.toLowerCase().includes(query);
+        return matchTab && matchQuery;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-14 bg-slate-900/50 border border-slate-800 rounded-2xl">
+            <p class="text-slate-400 text-sm font-medium">Nenhum exercício encontrado para "<span class="text-white">${query}</span>".</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(ex => {
+        const isDone = completedSet.has(ex.id);
+        const badgeColor = ex.workout === 'A'
+          ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+          : ex.workout === 'B'
+            ? 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30'
+            : 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+
+        return `
+          <article class="group relative bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl overflow-hidden flex flex-col transition-all duration-200 ${isDone ? 'card-completed' : ''}">
+            <!-- Topo com Badge e Checklist -->
+            <div class="px-4 pt-3.5 pb-2 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-md text-[11px] font-extrabold border ${badgeColor}">
+                  ${ex.workout}${ex.order}
+                </span>
+                <span class="text-[11px] font-semibold text-slate-400 truncate max-w-[185px]">
+                  ${ex.muscle}
+                </span>
+              </div>
+
+              <button onclick="toggleComplete('${ex.id}')" aria-label="Marcar como concluído"
+                class="w-8 h-8 rounded-xl flex items-center justify-center border transition-all ${
+                  isDone
+                    ? 'bg-emerald-500 border-emerald-400 text-slate-950 shadow-md shadow-emerald-500/30'
+                    : 'bg-slate-800/90 border-slate-700 text-slate-400 hover:border-emerald-500/50 hover:text-emerald-400'
+                }">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Palco SVG Biomecânico -->
+            <div class="mx-4 rounded-xl border border-slate-800/90 svg-stage relative overflow-hidden">
+              ${getExerciseSVG(ex.id)}
+              <div class="absolute bottom-1.5 right-2 flex items-center gap-2 text-[10px] font-medium text-slate-500">
+                <span class="inline-flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></i>Músculo</span>
+                <span class="inline-flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-amber-400 inline-block"></i>Vetor</span>
+              </div>
+            </div>
+
+            <!-- Conteúdo Técnico -->
+            <div class="p-4 flex-1 flex flex-col justify-between">
+              <div>
+                <h3 class="exercise-title text-base font-bold text-white leading-snug transition">
+                  ${ex.name}
+                </h3>
+                <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                  ${ex.tip}
+                </p>
+              </div>
+
+              <!-- Rodapé: Séries/Reps e Botão de Descanso -->
+              <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="px-2.5 py-1 rounded-lg bg-slate-850 border border-slate-700/80 text-xs font-extrabold text-white">
+                    ${ex.setsReps}
+                  </span>
+                </div>
+
+                ${ex.isCardio ? `
+                  <button onclick="startTimer(1200, 'Cardio: ${ex.name}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Iniciar ${ex.setsReps}
+                  </button>
+                ` : `
+                  <button onclick="startTimer(${ex.rest}, '${ex.name}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Descanso ${ex.rest}s
+                  </button>
+                `}
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // =========================================================================
+    // CRONÔMETRO DE DESCANSO COM ALERTA SONORO (WEB AUDIO API)
+    // =========================================================================
+    let timerInterval = null;
+    let remainingSeconds = 0;
+
+    function playBeep() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioCtx();
+        [0, 0.22].forEach(delay => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, ctx.currentTime + delay);
+          gain.gain.setValueAtTime(0.15, ctx.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.18);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + delay);
+          osc.stop(ctx.currentTime + delay + 0.18);
+        });
+      } catch (e) {
+        // Fallback silencioso caso o navegador bloqueie áudio automático
+      }
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = (sec % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function startTimer(seconds, label) {
+      clearInterval(timerInterval);
+      remainingSeconds = seconds;
+
+      const ring = document.getElementById('timerRing');
+      const title = document.getElementById('timerTitle');
+      const sub = document.getElementById('timerSubtitle');
+      const stopBtn = document.getElementById('stopTimerBtn');
+
+      title.textContent = label || 'Descanso em andamento';
+      sub.textContent = 'Mantenha o foco e respire fundo';
+      ring.textContent = formatTime(remainingSeconds);
+      ring.classList.add('border-emerald-500', 'bg-emerald-500/10');
+      stopBtn.classList.remove('hidden');
+
+      timerInterval = setInterval(() => {
+        remainingSeconds--;
+        if (remainingSeconds <= 0) {
+          clearInterval(timerInterval);
+          ring.textContent = '00:00';
+          ring.classList.remove('border-emerald-500', 'bg-emerald-500/10');
+          title.textContent = 'Tempo Esgotado!';
+          sub.textContent = 'Hora da próxima série';
+          stopBtn.classList.add('hidden');
+          playBeep();
+          showToast('Descanso finalizado! Bora para a próxima série.');
+        } else {
+          ring.textContent = formatTime(remainingSeconds);
+        }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      const ring = document.getElementById('timerRing');
+      ring.textContent = '00:00';
+      ring.classList.remove('border-emerald-500', 'bg-emerald-500/10');
+      document.getElementById('timerTitle').textContent = 'Cronômetro de Descanso';
+      document.getElementById('timerSubtitle').textContent = 'Selecione um tempo ou clique no card';
+      document.getElementById('stopTimerBtn').classList.add('hidden');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastBox');
+      document.getElementById('toastMessage').textContent = msg;
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+      }, 3200);
+    }
+
+    // Inicializa na aba A
+    switchTab('A');
+  </script>
+</body>
+</html>
